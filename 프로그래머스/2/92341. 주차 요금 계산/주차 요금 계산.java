@@ -2,10 +2,10 @@ import java.util.*;
 
 class Solution {
     class Car{
-        String number;     //차량번호
-        int inputTime;  //입차시간
-        int outputTime; //출차시간
-        int cumTime;    //누적시간
+        String number;      //차량번호
+        int inputTime;      //입차시간
+        int outputTime;     //출차시간
+        int cumTime;        //누적시간
         boolean status;     //주차장에 들어와있는지 여부
         
         public Car(String number,int inputTime){
