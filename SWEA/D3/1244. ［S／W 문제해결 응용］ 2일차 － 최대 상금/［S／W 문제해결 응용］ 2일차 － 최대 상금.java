@@ -1,39 +1,44 @@
-import java.util.*;
 import java.io.*;
-class Solution {
+
+public class Solution {
+    static BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+    static BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
+
     static char[] nums;
-    static int limitCount;
-    static int result;
-	public static void main(String args[]) throws Exception{
-		Scanner sc = new Scanner(System.in);
-		int T = sc.nextInt();
-		for(int tc = 1; tc <= T; tc++){
-            nums = sc.next().toCharArray();
-            limitCount = sc.nextInt();
-            result = 0;
+    static int totalChance;
+    static int answer;
+    public static void main(String[] args) throws IOException {
+        int T = Integer.parseInt(br.readLine());
+        for(int t=1;t<=T;t++){
+            String [] tokens = br.readLine().split(" ");
+            nums = tokens[0].toCharArray();
+            totalChance = Integer.parseInt(tokens[1]);
+            answer = 0;
             dfs(0,0);
-            System.out.println("#" + tc + " " + result);
-		}
-	}
-    private static void dfs(int pos,int count){
-        if(count == limitCount){
+            bw.write("#"+t+" "+answer+"\n");
+        }
+        bw.flush();
+        bw.close();
+        br.close();
+    }
+    static void dfs(int pos, int chance){
+        if(chance == totalChance){
             int value = Integer.parseInt(new String(nums));
-            result = Math.max(result,value);
+            answer = Math.max(value,answer);
             return;
         }
 
-        for(int i = pos; i < nums.length; i++){
-            for(int j =i + 1; j < nums.length; j++){
-            	swap(i,j);
-                dfs(i,count+1);					                
+        for(int i=pos;i<nums.length;i++){
+            for(int j=i+1;j<nums.length;j++){
+                swap(i,j);
+                dfs(i,chance+1);
                 swap(i,j);
             }
         }
     }
-    
-    private static void swap(int i, int j){
-        char tmp = nums[i];
+    static void swap(int i,int j){
+        char temp = nums[i];
         nums[i] = nums[j];
-        nums[j] = tmp;
+        nums[j] = temp;
     }
 }
