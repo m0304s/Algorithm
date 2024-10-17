@@ -9,7 +9,7 @@ public class Solution {
     static ArrayList<ArrayList<Integer>> nodeList = new ArrayList<>();
     static int N;
     static int M;
-    static int answer;
+    static int answer=1;
 
     public static void main(String[] args) throws IOException {
         int T = Integer.parseInt(br.readLine());
