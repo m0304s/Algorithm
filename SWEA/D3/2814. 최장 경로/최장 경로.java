@@ -1,5 +1,5 @@
 import java.io.*;
-import java.util.ArrayList;
+import java.util.*;
 
 public class Solution {
     static BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
@@ -13,20 +13,19 @@ public class Solution {
 
     public static void main(String[] args) throws IOException {
         int T = Integer.parseInt(br.readLine());
-        for(int t = 1; t <= T; t++){
-            String[] tokens = br.readLine().split(" ");
+        for(int t=1;t<=T;t++){
+            answer = 1;
+            String [] tokens = br.readLine().split(" ");
             N = Integer.parseInt(tokens[0]);
             M = Integer.parseInt(tokens[1]);
 
             visited = new boolean[N+1];
             nodeList = new ArrayList<>();
-            answer = 1; // 각 테스트 케이스마다 초기화
-
-            for(int i = 0; i <= N; i++){
+            for(int i=0;i<=N;i++){
                 nodeList.add(new ArrayList<>());
             }
 
-            for(int i = 0; i < M; i++){
+            for(int i=0;i<M;i++){
                 tokens = br.readLine().split(" ");
                 int x = Integer.parseInt(tokens[0]);
                 int y = Integer.parseInt(tokens[1]);
@@ -35,10 +34,8 @@ public class Solution {
                 nodeList.get(y).add(x);
             }
 
-            for(int i = 1; i <= N; i++){
-                visited[i] = true;
-                dfs(i, 1); // 시작 노드를 깊이 1로 시작
-                visited[i] = false;
+            for(int i=1;i<=N;i++){
+                dfs(i,0);
             }
             bw.write("#"+t+" "+answer+"\n");
         }
@@ -46,15 +43,24 @@ public class Solution {
         br.close();
         bw.close();
     }
-
     static void dfs(int startNode, int depth){
-        answer = Math.max(answer, depth); // 매번 최대값 갱신
-        for (int now : nodeList.get(startNode)) {
-            if(!visited[now]){
-                visited[now] = true;
-                dfs(now, depth + 1);
-                visited[now] = false;
+        if(allChildNodeHasVisited(startNode)){
+            answer = Math.max(answer,depth);
+        }else{
+            for (int now : nodeList.get(startNode)) {
+                if(!visited[now]){
+                    visited[now] = true;
+                    dfs(now,depth+1);
+                    visited[now] = false;
+                }
             }
         }
     }
+    static boolean allChildNodeHasVisited(int startNode){
+        for (int i: nodeList.get(startNode)) {
+            if(!visited[i]) return false;
+        }
+        return true;
+    }
+
 }
