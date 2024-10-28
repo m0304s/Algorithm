@@ -123,21 +123,27 @@ public class Solution {
                 }
                 map[tankX][tankY] = '>';
             }else if(command == 'S'){
-                shoot();
-            }
-        }
-    }
-    static void shoot() {
-        int missileX = tankX;
-        int missileY = tankY;
-        while (true) {
-            missileX += dx[tankDirection];
-            missileY += dy[tankDirection];
-            if (!inRange(missileX, missileY) || isWall(missileX, missileY)) {
-                if (inRange(missileX, missileY) && map[missileX][missileY] == '*') {
-                    map[missileX][missileY] = '.';
+                //포탄 발사
+                /**
+                 * 전차가 포탄을 발사하면, 포탄은 벽돌로 만들어진 벽 또는 강철로 만들어진 벽에 충돌하거나 게임 맵 밖으로 나갈 때까지 직진한다.
+                 * 만약 포탄이 벽에 부딪히면 포탄은 소멸하고, 부딪힌 벽이 벽돌로 만들어진 벽이라면 이 벽은 파괴되어 칸은 평지가 된다.
+                 * 강철로 만들어진 벽에 포탄이 부딪히면 아무 일도 일어나지 않는다.
+                 * 게임 맵 밖으로 포탄이 나가면 아무런 일도 일어나지 않는다.
+                 */
+                int missileX = tankX;
+                int missileY = tankY;
+                while (true){
+                    //새로운 포탄의 X,Y좌표 계산
+                    missileX += dx[tankDirection];
+                    missileY += dy[tankDirection];
+
+                    if(!inRange(missileX,missileY) || isWall(missileX,missileY)){
+                        if(inRange(missileX,missileY) && map[missileX][missileY] == '*'){
+                            map[missileX][missileY] = '.';
+                        }
+                        break;
+                    }
                 }
-                break;
             }
         }
     }
