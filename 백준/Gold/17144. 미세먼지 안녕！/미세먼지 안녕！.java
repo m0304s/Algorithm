@@ -56,35 +56,35 @@ public class Main {
         bw.close();
         br.close();
     }
-    
+
     private static void removeDust() {
-        AirCleaner topAirCleaner = airCleaners.get(0);
-        AirCleaner bottomAirCleaner = airCleaners.get(1);
+    AirCleaner topAirCleaner = airCleaners.get(0);
+    AirCleaner bottomAirCleaner = airCleaners.get(1);
+    
+    // 상부 공기청정기 바람 (반시계 방향)
+    int top = topAirCleaner.x;
+    for (int i = top - 1; i > 0; i--)
+        map[i][0] = map[i - 1][0];
+    for (int i = 0; i < M - 1; i++)
+        map[0][i] = map[0][i + 1];
+    for (int i = 0; i < top; i++)
+        map[i][M - 1] = map[i + 1][M - 1];
+    for (int i = M - 1; i > 1; i--)
+        map[top][i] = map[top][i - 1];
+    map[top][1] = 0;
 
-        // 상부 공기청정기 바람 (반시계 방향)
-        int top = topAirCleaner.x;
-        for (int i = top - 1; i > 0; i--)
-            map[i][0] = map[i - 1][0];
-        for (int i = 0; i < M - 1; i++)
-            map[0][i] = map[0][i + 1];
-        for (int i = 0; i < top; i++)
-            map[i][M - 1] = map[i + 1][M - 1];
-        for (int i = M - 1; i > 1; i--)
-            map[top][i] = map[top][i - 1];
-        map[top][1] = 0;
-
-        // 하부 공기청정기 바람 (시계 방향)
-        int bottom = bottomAirCleaner.x;
-        for (int i = bottom + 1; i < N - 1; i++)
-            map[i][0] = map[i + 1][0];
-        for (int i = 0; i < M - 1; i++)
-            map[N - 1][i] = map[N - 1][i + 1];
-        for (int i = N - 1; i > bottom; i--)
-            map[i][M - 1] = map[i - 1][M - 1];
-        for (int i = M - 1; i > 1; i--)
-            map[bottom][i] = map[bottom][i - 1];
-        map[bottom][1] = 0;
-    }
+    // 하부 공기청정기 바람 (시계 방향)
+    int bottom = bottomAirCleaner.x;
+    for (int i = bottom + 1; i < N - 1; i++)
+        map[i][0] = map[i + 1][0];
+    for (int i = 0; i < M - 1; i++)
+        map[N - 1][i] = map[N - 1][i + 1];
+    for (int i = N - 1; i > bottom; i--)
+        map[i][M - 1] = map[i - 1][M - 1];
+    for (int i = M - 1; i > 1; i--)
+        map[bottom][i] = map[bottom][i - 1];
+    map[bottom][1] = 0;
+}
 
     private static void diffusionDust(){
         int [][] tempMap = new int[N][M];
