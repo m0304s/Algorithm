@@ -1,43 +1,39 @@
 import java.io.*;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Set;
 
 public class Main {
-    public static BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-    public static BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
-    public static HashMap<String, ArrayList<String>> hash = new HashMap<>();
-    public static void main(String[] args) throws IOException{
-        int N = Integer.parseInt(br.readLine());
-        for(int i=0;i<N;i++){
-            hash.clear();
-            int numOfCloths = Integer.parseInt(br.readLine());
-            for(int j=0;j<numOfCloths;j++){
-                String [] tokens = br.readLine().split(" ");
-                String cloth = tokens[0];
-                String category = tokens[1];
+    static BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+    static BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
 
-                if(!hash.containsKey(category)){
-                    ArrayList<String> list = new ArrayList<>();
-                    list.add(cloth); 
-                    hash.put(category, list);
+    static int N;
+
+    public static void main(String[] args) throws IOException {
+        int T = Integer.parseInt(br.readLine());
+        for(int t=1;t<=T;t++){
+            N = Integer.parseInt(br.readLine());
+            HashMap<String, Integer> categoryMap = new HashMap<>();
+            for(int i=0;i<N;i++){
+                String [] tokens = br.readLine().split(" ");
+                String name = tokens[0];
+                String type = tokens[1];
+
+                if(categoryMap.containsKey(type)){
+                    categoryMap.put(type,categoryMap.get(type)+1);
                 }else{
-                    ArrayList<String> list = hash.get(category);
-                    list.add(cloth);
+                    categoryMap.put(type,2);
                 }
             }
-            // Category 별로 조합을 구함
-            Set<String> keys = hash.keySet();
-            ArrayList<Integer> cntlist = new ArrayList<>();
-            for(String s : keys){
-                int categoryCnt = hash.get(s).size();   //각 카테고리에 몇 가지의 의류가 있는지
-                categoryCnt++;  //안 입는 경우 고려
-                cntlist.add(categoryCnt);
-            }
+
             int answer = 1;
-            for(Integer j : cntlist){
-                answer = answer*j;
+            Set<String> keySet = categoryMap.keySet();
+            for (String s : keySet) {
+                answer*=categoryMap.get(s);
             }
-            bw.write(Integer.toString(answer-1)+"\n");
+            bw.write(answer-1+"\n");
         }
         bw.flush();
+        bw.close();
+        br.close();
     }
 }
