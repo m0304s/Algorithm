@@ -26,8 +26,11 @@ public class Main {
         backtracking(0,0,0,0,"");
         Collections.sort(answers);
         for (String answer : answers) {
-            System.out.println(answer);
+            bw.write(answer+"\n");
         }
+        bw.flush();
+        bw.close();
+        br.close();
     }
     private static void backtracking(int depth, int index,int vowels, int consonants,String password){
         if(depth == L){
