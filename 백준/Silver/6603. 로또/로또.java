@@ -1,50 +1,45 @@
 import java.io.*;
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Main {
-    public static BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-    public static BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
-    public static int [] arr;
-    public static boolean [] visited;
-    public static void main(String[] args) throws IOException{
+    static BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+    static BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
+    static List<Integer> numbers;
+    static int [] output;
+    static int K;
+
+    public static void main(String[] args) throws IOException {
         while(true){
             String [] tokens = br.readLine().split(" ");
-            int N = Integer.parseInt(tokens[0]);
-            arr = new int[7];
-            visited = new boolean[N];
-            if(N==0){
-                break;
+            if(Integer.parseInt(tokens[0]) == 0) break;
+            K = Integer.parseInt(tokens[0]);
+            numbers = new ArrayList<>();
+            output = new int[6];
+            for(int i=1;i<tokens.length;i++){
+                numbers.add(Integer.parseInt(tokens[i]));
             }
-            int [] nums = new int[N];
-            for(int i=0;i<N;i++){
-                nums[i]=Integer.parseInt(tokens[i+1]);
-            }
-            Arrays.sort(nums);
 
-            dfs(N,nums,1);
+            combination(0,0);
             bw.write("\n");
         }
         bw.flush();
+        bw.close();
+        br.close();
     }
-    public static void dfs(int N,int [] nums,int depth) throws IOException{
-        if(depth==7){
-            for(int i=1;i<7;i++){
-                bw.write(nums[arr[i]]+" ");
+
+    private static void combination(int depth, int index) throws IOException{
+        if(depth == 6){
+            String answer = "";
+            for (int i : output) {
+                answer+=i+" ";
             }
-            bw.write("\n");
+            bw.write(answer+"\n");
             return;
         }
-        for(int i=0;i<N;i++){
-            if(arr[depth-1] > i){
-                continue;
-            }
-            if(!visited[i]){
-                visited[i]=true;
-                arr[depth]=i;
-                dfs(N,nums,depth+1);
-                visited[i]=false;
-            }
-        }
-        return;
+        if(index >= K) return;
+        output[depth] = numbers.get(index);
+        combination(depth+1,index+1);
+        combination(depth,index+1);
     }
 }
