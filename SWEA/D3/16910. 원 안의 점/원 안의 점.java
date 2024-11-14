@@ -18,8 +18,8 @@ public class Solution {
     }
     private static int findCounts(){
         int count = 0;
-        for(int i=-200;i<=200;i++){
-            for(int j=-200;j<=200;j++){
+        for(int i=-N;i<=N;i++){
+            for(int j=-N;j<=N;j++){
                 int multipleX = i*i;
                 int multipleY = j*j;
                 int multipleN = N*N;
