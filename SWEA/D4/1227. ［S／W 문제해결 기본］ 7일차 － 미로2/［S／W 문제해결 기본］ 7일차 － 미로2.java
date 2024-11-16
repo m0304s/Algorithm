@@ -3,24 +3,19 @@ import java.util.LinkedList;
 import java.util.Queue;
 
 public class Solution {
+    static final int MAPSIZE = 100;
+    static final int END = 3;
+    static final int START = 2;
+    static final int WALL = 1;
+    static final int ROAD = 0;
+
     static BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
     static BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
 
-    static final int WALL = 1;
-    static final int ROAD = 0;
-    static final int START = 2;
-    static final int END = 3;
-    static final int TEST_CASE = 10;
-    static final int MAP_SIZE = 100;
-
+    static int[][] map;
     static int [] dx = {-1,1,0,0};
     static int [] dy = {0,0,-1,1};
-
-    static int [][] map;
-    static boolean [][] visited;
-
-    static int startX,startY;
-    static int endX,endY;
+    static boolean[][] visited;
 
     static class Node{
         int x,y;
@@ -29,15 +24,20 @@ public class Solution {
             this.y = y;
         }
     }
-
+    static int startX,startY,endX,endY;
     public static void main(String[] args) throws IOException {
-        for(int t=1;t<=TEST_CASE;t++){
-            map = new int[MAP_SIZE][MAP_SIZE];
-            visited = new boolean[MAP_SIZE][MAP_SIZE];
+        int T = 10;
+        for(int t=1;t<=T;t++){
             int testCase = Integer.parseInt(br.readLine());
-            for(int i=0;i<map.length;i++){
+            map = new int[MAPSIZE][MAPSIZE];
+            visited = new boolean[MAPSIZE][MAPSIZE];
+            startX = 0;
+            startY = 0;
+            endX = 0;
+            endY = 0;
+            for(int i=0;i<MAPSIZE;i++){
                 String input = br.readLine();
-                for(int j=0;j<input.length();j++){
+                for(int j=0;j<MAPSIZE;j++){
                     map[i][j] = input.charAt(j) - '0';
                     if(map[i][j] == START){
                         startX = i;
@@ -48,43 +48,44 @@ public class Solution {
                     }
                 }
             }
-
-            boolean possible = bfs(startX,startY);
-            if(possible){
-                bw.write("#"+t+" " + "1\n");
+            bw.write("#"+testCase+" ");
+            boolean result = bfs(startX, startY);
+            if(result){
+                bw.write("1\n");
             }else{
-                bw.write("#"+t+" " + "0\n");
+                bw.write("0\n");
             }
         }
         bw.flush();
         bw.close();
         br.close();
     }
-    static boolean bfs(int startX,int startY){
-        Queue<Node> q = new LinkedList<>();
-        q.add(new Node(startX,startY));
-        visited[startX][startY] = true;
+    private static boolean bfs(int x,int y){
+        Queue<Node> queue = new LinkedList<>();
+        queue.add(new Node(x,y));
+        visited[x][y] = true;
 
-        while(!q.isEmpty()){
-            Node cur = q.poll();
-            if(map[cur.x][cur.y] == END) return true;
+        while (!queue.isEmpty()){
+            Node cur = queue.poll();
+            if(cur.x == endX && cur.y == endY){
+                return true;
+            }
 
-            visited[cur.x][cur.y] = true;
             for(int i=0;i<4;i++){
                 int nx = cur.x + dx[i];
                 int ny = cur.y + dy[i];
-
-                if(!inRange(nx,ny) || visited[nx][ny]) continue;
+                if(!inRange(nx,ny)) continue;
+                if(visited[nx][ny]) continue;
                 if(map[nx][ny] == WALL) continue;
-                
+
                 visited[nx][ny] = true;
-                q.add(new Node(nx,ny));
+                queue.add(new Node(nx,ny));
             }
         }
 
         return false;
     }
-    static boolean inRange(int x,int y){
-        return x >= 0 && x < MAP_SIZE && y >= 0 && y < MAP_SIZE;
+    private static boolean inRange(int x,int y){
+        return x >= 0 && x < MAPSIZE && y >= 0 && y < MAPSIZE;
     }
 }
