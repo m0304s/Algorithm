@@ -1,80 +1,111 @@
 import java.io.*;
 
 public class Solution {
-    static BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-    static BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
-    
-    static final int ROAD = 1;
-    static final int MAP_SIZE = 100;
-    static final int TEST_CASE = 10;
-
     //좌 우 하
     static int [] dx = {0,0,1};
     static int [] dy = {-1,1,0};
 
+    static BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+    static BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
+
+    static final int TESTCASE = 10;
+    static final int BOARDSIZE = 100;
+    static final int WALL = 0;
+    static final int ROAD = 1;
+
+    static int [][] board;
     static int [][] map;
+    static int minLength;
+    static int answer;
 
     public static void main(String[] args) throws IOException {
-        for(int t=1;t<=TEST_CASE;t++){
-            map = new int[MAP_SIZE][MAP_SIZE];
-            int testCase = Integer.parseInt(br.readLine());
-            for(int i=0;i<MAP_SIZE;i++){
-                String [] tokens = br.readLine().split(" ");
-                for(int j=0;j<MAP_SIZE;j++){
-                    map[i][j] = Integer.parseInt(tokens[j]);
+        for(int t=1;t<=TESTCASE;t++){
+            br.readLine();
+            minLength = Integer.MAX_VALUE;
+            answer = 0;
+            board = new int[BOARDSIZE][BOARDSIZE];
+            makeBoard();
+            cloneBoard();
+            for(int x=0;x<BOARDSIZE;x++){
+                if(map[0][x] == ROAD){
+                    simulate(0,x);
                 }
             }
-
-            int minLength = Integer.MAX_VALUE;
-            int resultX = 0;
-            for(int j=0;j<MAP_SIZE;j++){
-                if(map[0][j] == ROAD){
-                    int length = move(0,j);
-                    if(minLength > length){
-                        resultX = j;
-                        minLength = length;
-                    }
-                }
-            }
-            bw.write("#"+t+" "+resultX+"\n");
+            bw.write("#"+t+" "+answer+"\n");
         }
         bw.flush();
-        br.close();
         bw.close();
+        br.close();
     }
+    private static void simulate(int startX,int startY){
+        int count = 0;
+        int x = startX;
+        int y = startY;
 
-    static int move(int x,int y){
-        int length = 0;
+        while(inRange(x,y) && map[x][y] == ROAD){
+            if(x == BOARDSIZE-1) break;
+            count++;
+            //좌측 또는 우측으로 갈 수 있으면 끝까지 이동
+            for(int i=0;i<2;i++){
+                int nx = x + dx[i];
+                int ny = y + dy[i];
 
-        int nx = x;
-        int ny = y;
+                if(!inRange(nx,ny)) continue;
+                if(map[nx][ny] == WALL) continue;
 
-        while (true){
-            if(inRange(nx,ny) && map[nx][ny] == 1 && nx == MAP_SIZE-1){
+                while(inRange(nx,ny) && map[nx][ny] == ROAD){
+                    nx += dx[i];
+                    ny += dy[i];
+                    count++;
+                }
+                x = (nx-dx[i]);
+                y = (ny-dy[i]);
                 break;
             }
-            for(int i=0;i<2;i++){
-                if(inRange(nx+dx[i],ny+dy[i]) && map[nx+dx[i]][ny+dy[i]] == 1){
-                    //벽에 도달할때까지 그 방향으로 이동
-                    while(inRange(nx,ny) && map[nx][ny] == 1){
-                        length++;
-                        nx += dx[i];
-                        ny += dy[i];
-                    }
-                    nx-=dx[i];
-                    ny-=dy[i];
+            //아래로 이동 -> 좌측 또는 우측이 1이 나올때까지 중지
+            x+=dx[2];
+            y+=dy[2];
+            while(inRange(x,y) && map[x][y] == ROAD){
+                if(checkLeftRightBlock(x,y)){
                     break;
+                }else{
+                    x += dx[2];
+                    y += dy[2];
+                    count++;
                 }
             }
-            //아래 방향으로 이동
-            nx+=dx[2];
-            ny+=dy[2];
-            length++;
         }
-        return length;
+        if(minLength >= count){
+            minLength = Math.min(minLength,count);
+            answer = Math.max(answer,startY);
+        }
+    }
+    private static boolean checkLeftRightBlock(int x, int y){
+        for(int i=0;i<2;i++){
+            int nx = x + dx[i];
+            int ny = y + dy[i];
+
+            if(inRange(nx,ny) && map[nx][ny] == ROAD) return true;
+        }
+        return false;
+    }
+    private static boolean inRange(int x,int y){
+        return x >= 0 && x < BOARDSIZE && y >= 0 && y < BOARDSIZE;
     }
 
-    static boolean inRange(int x,int y){
-        return x >= 0 && x < MAP_SIZE && y >=0 && y < MAP_SIZE;
+    private static void cloneBoard() {
+        map = new int[BOARDSIZE][BOARDSIZE];
+        for (int i=0; i<BOARDSIZE;i++) {
+            map[i] = board[i].clone();
+        }
+    }
+
+    private static void makeBoard() throws IOException{
+        for(int i=0;i<BOARDSIZE;i++){
+            String [] tokens = br.readLine().split(" ");
+            for(int j=0;j<BOARDSIZE;j++){
+                board[i][j] = Integer.parseInt(tokens[j]);
+            }
+        }
     }
 }
