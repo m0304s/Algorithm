@@ -4,24 +4,20 @@ public class Solution {
     static BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
     static BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
 
-    static int[] costs;
-    static int[] calories;
-
     static int N,L;
+    static int [] costs;
+    static int [] calories;
     static int maxCost;
-    static int[] output;
-
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws IOException{
         int T = Integer.parseInt(br.readLine());
         for(int t=1;t<=T;t++){
-            maxCost = Integer.MIN_VALUE;
             String [] tokens = br.readLine().split(" ");
             N = Integer.parseInt(tokens[0]);
             L = Integer.parseInt(tokens[1]);
 
+            maxCost = Integer.MIN_VALUE;
             costs = new int[N];
             calories = new int[N];
-            output = new int[N];
 
             for(int i=0;i<N;i++){
                 tokens = br.readLine().split(" ");
@@ -30,21 +26,17 @@ public class Solution {
             }
 
             combination(0,0,0);
-            bw.write("#"+t+" "+maxCost+"\n");
+            System.out.println("#"+t+" "+maxCost);
         }
-        bw.flush();
-        bw.close();
-        br.close();
     }
-    private static void combination(int index, int totalCost, int totalCalories){
-        if(index == N){
-            if(totalCalories<=L){
-                maxCost = Math.max(maxCost,totalCost);
-            }
-            return;
-        }
 
-        combination(index+1,totalCost,totalCalories);
-        combination(index+1,totalCost+costs[index],totalCalories+calories[index]);
+    private static void combination(int index, int currentCost, int currentCalories){
+        if(currentCalories > L) return;
+        maxCost = Math.max(maxCost,currentCost);
+        if(index>=N) return;
+        //지금 현재 재료를 선택하는 경우
+        combination(index+1,currentCost+costs[index],currentCalories+calories[index]);
+        //지금 현재 재료를 선택하지 않는 경우
+        combination(index+1,currentCost,currentCalories);
     }
 }
