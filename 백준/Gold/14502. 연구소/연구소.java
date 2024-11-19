@@ -6,66 +6,60 @@ public class Main {
     static BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
     static BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
 
+    static int [][] map;
+    static int [] dx = {-1,1,0,0};
+    static int [] dy = {0,0,-1,1};
+
+    static class Node{
+        int x,y;
+        public Node(int x,int y){
+            this.x = x;
+            this.y = y;
+        }
+    }
+
+    static int N,M,maxSafeZone;
+
     static final int ROAD = 0;
     static final int WALL = 1;
     static final int VIRUS = 2;
 
-    static int N,M;
-    static int [][] originMap;
-
-    static int [] dx = {0,0,-1,1};
-    static int [] dy = {1,-1,0,0};
-    static int maxSafeZoneCnt = Integer.MIN_VALUE;
-
-    static class Node{
-        int x,y;
-
-        public Node(int x,int y){
-            this.x =x;
-            this.y =y;
-        }
-    }
     public static void main(String[] args) throws IOException{
         String [] tokens = br.readLine().split(" ");
         N = Integer.parseInt(tokens[0]);
         M = Integer.parseInt(tokens[1]);
-
-        originMap = new int[N][M];
+        maxSafeZone = 0;
+        map = new int[N][M];
 
         for(int i=0;i<N;i++){
             tokens = br.readLine().split(" ");
             for(int j=0;j<M;j++){
-                originMap[i][j] = Integer.parseInt(tokens[j]);
+                map[i][j] = Integer.parseInt(tokens[j]);
             }
         }
 
         dfs(0);
-        bw.write(maxSafeZoneCnt+"\n");
-        bw.flush();
-        bw.close();
-        br.close();
+        System.out.println(maxSafeZone);
     }
-    static void dfs(int wallCount){
-        if(wallCount == 3){
+    private static void dfs(int depth){
+        if(depth == 3){
             bfs();
             return;
         }
-
         for(int i=0;i<N;i++){
             for(int j=0;j<M;j++){
-                if(originMap[i][j] == ROAD){
-                    originMap[i][j] = WALL;
-                    dfs(wallCount+1);
-                    originMap[i][j] = ROAD;
+                if(map[i][j] == ROAD){
+                    map[i][j] = WALL;
+                    dfs(depth+1);
+                    map[i][j] = ROAD;
                 }
             }
         }
     }
 
-    static void bfs(){
+    private static void bfs(){
         Queue<Node> queue = new LinkedList<>();
-        int [][] copyMap = copyMap();
-
+        int [][] copyMap = cloneMap();
         for(int i=0;i<N;i++){
             for(int j=0;j<M;j++){
                 if(copyMap[i][j] == VIRUS){
@@ -81,40 +75,37 @@ public class Main {
                 int nx = cur.x + dx[i];
                 int ny = cur.y + dy[i];
 
-                if(inRange(nx,ny) && copyMap[nx][ny] == ROAD){
-                    queue.add(new Node(nx,ny));
-                    copyMap[nx][ny] = VIRUS;
-                }
+                if(!inRange(nx,ny)) continue;
+                if(copyMap[nx][ny] != ROAD) continue;
+
+                copyMap[nx][ny] = VIRUS;
+                queue.add(new Node(nx,ny));
             }
         }
 
-        countSafeZone(copyMap);
+        maxSafeZone = Math.max(maxSafeZone,countSafeZone(copyMap));
     }
-    static void countSafeZone(int [][] copyMap){
-        int safeZoneCnt = 0;
+
+    private static int countSafeZone(int [][] map) {
+        int count = 0;
+        for (int i=0;i<N;i++){
+            for(int j=0;j<M;j++){
+                if(map[i][j] == ROAD) count++;
+            }
+        }
+        return count;
+    }
+
+    private static boolean inRange(int x,int y){
+        return x >= 0 && x < N && y >= 0 && y < M;
+    }
+    private static int [][] cloneMap(){
+        int [][] copyMap = new int[N][M];
         for(int i=0;i<N;i++){
             for(int j=0;j<M;j++){
-                if(copyMap[i][j] == ROAD){
-                    safeZoneCnt++;
-                }
+                copyMap[i][j] = map[i][j];
             }
         }
-
-        maxSafeZoneCnt = Math.max(safeZoneCnt,maxSafeZoneCnt);
-    }
-
-    static boolean inRange(int x,int y){
-        return x >=0 && x < N && y >= 0 && y < M;
-    }
-
-    static int [][] copyMap(){
-        int [][] map = new int[N][M];
-        for(int i=0;i<N;i++){
-            for(int j=0;j<M;j++){
-                map[i][j] = originMap[i][j];
-            }
-        }
-
-        return map;
+        return copyMap;
     }
 }
