@@ -4,7 +4,7 @@
 
 ### 성능 요약
 
-메모리: 323940 KB, 시간: 2416 ms
+메모리: 314448 KB, 시간: 952 ms
 
 ### 분류
 
@@ -12,7 +12,7 @@
 
 ### 제출 일자
 
-2024년 11월 8일 22:13:59
+2024년 11월 21일 14:03:49
 
 ### 문제 설명
 
@@ -21,11 +21,11 @@
 <table class="table table table-bordered" style="width: 100%;">
 	<tbody>
 		<tr>
-			<td style="width: 20%; text-align: center; vertical-align: middle;"><img alt="" src="" style="width: 113px; height: 70px;"></td>
-			<td style="width: 20%; text-align: center;vertical-align: middle;"><img alt="" src="" style="width: 156px; height: 70px;"></td>
-			<td style="width: 20%; text-align: center;vertical-align: middle;"><img alt="" src="" style="width: 100px; height: 100px;"></td>
-			<td style="width: 20%; text-align: center;vertical-align: middle;"><img alt="" src="" style="width: 138px; height: 100px;"></td>
-			<td style="width: 20%; text-align: center;vertical-align: middle;"><img alt="" src="" style="width: 149px; height: 150px;"></td>
+			<td style="width: 20%; text-align: center; vertical-align: middle;"><img alt="" src="https://onlinejudgeimages.s3-ap-northeast-1.amazonaws.com/problem/15683/1.png" style="width: 113px; height: 70px;"></td>
+			<td style="width: 20%; text-align: center;vertical-align: middle;"><img alt="" src="https://onlinejudgeimages.s3-ap-northeast-1.amazonaws.com/problem/15683/2.png" style="width: 156px; height: 70px;"></td>
+			<td style="width: 20%; text-align: center;vertical-align: middle;"><img alt="" src="https://onlinejudgeimages.s3-ap-northeast-1.amazonaws.com/problem/15683/3.png" style="width: 100px; height: 100px;"></td>
+			<td style="width: 20%; text-align: center;vertical-align: middle;"><img alt="" src="https://onlinejudgeimages.s3-ap-northeast-1.amazonaws.com/problem/15683/4.png" style="width: 138px; height: 100px;"></td>
+			<td style="width: 20%; text-align: center;vertical-align: middle;"><img alt="" src="https://onlinejudgeimages.s3-ap-northeast-1.amazonaws.com/problem/15683/5.png" style="width: 149px; height: 150px;"></td>
 		</tr>
 		<tr>
 			<td style="width: 20%; text-align: center;">1번</td>

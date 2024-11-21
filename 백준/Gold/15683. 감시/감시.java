@@ -1,131 +1,131 @@
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Queue;
 
 public class Main {
     static BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
     static BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
 
-    static int N,M;
+    static int N,M,minBlindSpot;
     static int [][] originalMap;
-    static int [][] copyMap;
-    static int [] output;
-    static int answer = 0;
-    static ArrayList<CCTV> cctvList = new ArrayList<>();
+    static int [][] cloneMap;
 
-    //상 우 하 좌
-    static int [] dx = {-1,0,1,0};
-    static int [] dy = {0,1,0,-1};
+    static final int ROAD = 0;
+    static final int WALL = 6;
 
     static class CCTV{
-        int num,x,y;
-        public CCTV(int num,int x,int y){
-            this.num = num;
+        int x;
+        int y;
+        int number;
+
+        public CCTV(int x,int y, int number){
             this.x = x;
             this.y = y;
+            this.number = number;
         }
     }
 
-    public static void main(String[] args) throws IOException {
+    static int[] dx = {-1, 0, 1, 0}; // 상 우 하 좌 시계방향 순서
+    static int[] dy = {0, 1, 0, -1};
+
+    static List<CCTV> cctvList;
+    static int [] output;
+    public static void main(String[] args) throws IOException{
         String [] tokens = br.readLine().split(" ");
         N = Integer.parseInt(tokens[0]);
         M = Integer.parseInt(tokens[1]);
-
+        minBlindSpot = Integer.MAX_VALUE;
         originalMap = new int[N][M];
-        answer = Integer.MAX_VALUE;
+        cctvList = new ArrayList<>();
+
         for(int i=0;i<N;i++){
             tokens = br.readLine().split(" ");
             for(int j=0;j<M;j++){
                 originalMap[i][j] = Integer.parseInt(tokens[j]);
-                if(originalMap[i][j] != 0 && originalMap[i][j] != 6){
-                    cctvList.add(new CCTV(originalMap[i][j],i,j));
+                if(originalMap[i][j] != ROAD && originalMap[i][j] != WALL){
+                    cctvList.add(new CCTV(i,j,originalMap[i][j]));
                 }
             }
         }
         output = new int[cctvList.size()];
-        permutation(0,cctvList.size());
-        System.out.println(answer);
+        permutation(0);
+        System.out.println(minBlindSpot);
     }
-    static void permutation(int depth, int r){
-        if(depth == r){
-            copyMap = cloneMap();
-
-            for(int i=0;i<cctvList.size();i++){
+    private static void permutation(int depth){
+        if(depth == cctvList.size()){
+            cloneMap = getCloneMap();
+            for(int i=0;i< output.length;i++){
                 direction(cctvList.get(i),output[i]);
             }
-            getSafeZone();
+            getBlindSpot();
             return;
         }
 
         for(int i=0;i<4;i++){
             output[depth] = i;
-            permutation(depth+1,r);
+            permutation(depth+1);
         }
     }
 
-    private static void getSafeZone() {
-        int count = 0;
+    private static void getBlindSpot() {
+        int blindSpot = 0;
         for(int i=0;i<N;i++){
             for(int j=0;j<M;j++){
-                if(copyMap[i][j] == 0) count++;
+                if(cloneMap[i][j] == 0) blindSpot++;
             }
         }
-        answer = Math.min(answer,count);
+        minBlindSpot = Math.min(minBlindSpot,blindSpot);
     }
 
-    static void direction(CCTV cctv, int d){
-        int cctvNum = cctv.num;
-        if(cctvNum == 1){
-            if(d == 0) watch(cctv,0);
-            if(d == 1) watch(cctv,1);
-            if(d == 2) watch(cctv,2);
-            if(d == 3) watch(cctv,3);
-        }else if(cctvNum == 2) {
-            if(d == 0 || d == 2){
+    private static void direction(CCTV cctv, int direction) {
+        if (cctv.number == 1){
+            if(direction == 0) watch(cctv,0);
+            else if(direction == 1) watch(cctv,1);
+            else if(direction == 2) watch(cctv,2);
+            else if(direction == 3) watch(cctv,3);
+        }else if(cctv.number == 2){
+            if(direction == 0 || direction == 2){
                 watch(cctv,0);
                 watch(cctv,2);
-            }else if(d == 1 || d == 3){
+            }else if(direction == 1 || direction == 3){
                 watch(cctv,1);
                 watch(cctv,3);
             }
-        }else if(cctvNum == 3) {
-            if(d == 0){
+        }else if(cctv.number == 3){
+            if(direction == 0){ //상우
                 watch(cctv,0);
                 watch(cctv,1);
-            }else if(d == 1){
-                watch(cctv,1);
-                watch(cctv,2);
-            }else if(d == 2){
+            }else if(direction == 1) {   //우하
+                watch(cctv, 1);
+                watch(cctv, 2);
+            }else if(direction == 2){   //하좌
                 watch(cctv,2);
                 watch(cctv,3);
-            }else if(d == 3){
+            }else if(direction == 3){   //좌상
                 watch(cctv,3);
                 watch(cctv,0);
             }
-        }else if(cctvNum == 4) {
-            if(d == 0){
+        }else if(cctv.number == 4){
+            if(direction == 0){
                 watch(cctv,0);
                 watch(cctv,1);
                 watch(cctv,3);
-            }else if(d == 1){
-                watch(cctv,1);
+            }else if (direction == 1){
                 watch(cctv,0);
-                watch(cctv,2);
-            }else if(d == 2){
-                watch(cctv,2);
                 watch(cctv,1);
+                watch(cctv,2);
+            }else if(direction == 2){
+                watch(cctv,1);
+                watch(cctv,2);
                 watch(cctv,3);
-            }else if(d == 3){
+            }else if(direction == 3){
                 watch(cctv,0);
                 watch(cctv,2);
                 watch(cctv,3);
             }
-        }else if(cctvNum == 5) {
+        }else if(cctv.number == 5){
             watch(cctv,0);
             watch(cctv,1);
             watch(cctv,2);
@@ -133,40 +133,37 @@ public class Main {
         }
     }
 
-    private static void watch(CCTV cctv, int d) {
+    private static void watch(CCTV cctv, int i) {
         Queue<CCTV> queue = new LinkedList<>();
-        boolean [][] visited = new boolean[N][M];
-        queue.add(cctv);
-        visited[cctv.x][cctv.y] = true;
+        queue.add(new CCTV(cctv.x,cctv.y,cctv.number));
 
         while(!queue.isEmpty()){
             CCTV cur = queue.poll();
 
-            int nx = cur.x + dx[d];
-            int ny = cur.y + dy[d];
+            int nx = cur.x + dx[i];
+            int ny = cur.y + dy[i];
 
             if(!inRange(nx,ny)) break;
-            if(copyMap[nx][ny] == 6) break;
+            if(cloneMap[nx][ny] == WALL) break;
 
-            if(copyMap[nx][ny] == 0){
-                copyMap[nx][ny] = -1;
-                queue.add(new CCTV(cctv.num,nx,ny));
+            if(cloneMap[nx][ny] == 0){
+                queue.add(new CCTV(nx,ny,cctv.number));
+                cloneMap[nx][ny] = -1;
             }else{
-                queue.add(new CCTV(cctv.num,nx,ny));
+                queue.add(new CCTV(nx,ny,cctv.number));
             }
         }
     }
-    static boolean inRange(int x,int y){
-        return x >= 0 && x < N && y >= 0 && y < M;
-    }
 
-    static int [][] cloneMap(){
-        int[][] map = new int[N][M];
+    private static int [][] getCloneMap(){
+        int [][] map = new int[N][M];
         for(int i=0;i<N;i++){
-            for(int j=0;j<M;j++){
-                map[i][j] = originalMap[i][j];
-            }
+            map[i] = originalMap[i].clone();
         }
         return map;
+    }
+
+    private static boolean inRange(int x,int y){
+        return x >= 0 && x < N && y >= 0 && y <M;
     }
 }
