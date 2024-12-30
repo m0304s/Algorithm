@@ -26,53 +26,41 @@ public class Main {
         }
     }
 
-    private static void printTop() throws IOException{
-        for(int i=0;i<3;i++){
-            for(int j=0;j<3;j++){
-                bw.write(cube[UP][j][2-i]+"");
-            }bw.write("\n");
-        }
-        bw.flush();
-    }
-
     private static void turn(String input){
         char direction = input.charAt(0);
         boolean flag = input.charAt(1) == '+';
 
         switch (direction){
-            case 'U':
-                alter(UP,LEFT,FRONT,RIGHT,BACK,flag);
+            case 'U' :
+                rotate(UP,LEFT,FRONT,RIGHT,BACK,flag);
                 break;
-            case 'D':
-                alter(DOWN,BACK,RIGHT,FRONT,LEFT,flag);
+            case 'D' :
+                rotate(DOWN,BACK,RIGHT,FRONT,LEFT,flag);
                 break;
-            case 'F':
-                alter(FRONT,UP,LEFT,DOWN,RIGHT,flag);
+            case 'F' :
+                rotate(FRONT,UP,LEFT,DOWN,RIGHT,flag);
                 break;
-            case 'B':
-                alter(BACK,RIGHT,DOWN,LEFT,UP,flag);
+            case 'B' :
+                rotate(BACK,RIGHT,DOWN,LEFT,UP,flag);
                 break;
-            case 'L':
-                alter(LEFT,FRONT,UP,BACK,DOWN,flag);
+            case 'L' :
+                rotate(LEFT,FRONT,UP,BACK,DOWN,flag);
                 break;
-            case 'R':
-                alter(RIGHT,DOWN,BACK,UP,FRONT,flag);
-                break;
-            default:
-                break;
+            case 'R' :
+                rotate(RIGHT,DOWN,BACK,UP,FRONT,flag);
         }
     }
 
-    private static void alter(int front, int up, int left, int down, int right, boolean flag){
+    private static void rotate(int front, int up, int left, int down, int right, boolean flag){
         char [][] upsideTemp = new char[3][3];
         char [] sideTemp = new char[3];
+
         if(flag){
             for(int i=0;i<3;i++){
                 for(int j=0;j<3;j++){
                     upsideTemp[i][j] = cube[front][2-j][i];
                 }
             }
-
             for(int i=0;i<3;i++){
                 sideTemp[i] = cube[up][i][0];
             }
@@ -112,6 +100,16 @@ public class Main {
         }
         cube[front] = upsideTemp;
     }
+
+   private static void printTop() throws IOException{
+        for(int i=0;i<3;i++){
+            for(int j=0;j<3;j++){
+                bw.write(cube[UP][j][2-i]+"");
+            }
+            bw.write("\n");
+        }
+        bw.flush();
+   }
 
     private static void init(){
         cube = new char[6][3][3];
