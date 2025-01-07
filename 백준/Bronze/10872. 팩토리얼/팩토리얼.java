@@ -1,18 +1,24 @@
 import java.util.*;
+import java.io.*;
 
 public class Main {
-    public static void main(String[] args) {
-        Scanner kb = new Scanner(System.in);
-        int N = kb.nextInt();
-        kb.close();
-        int result = factorial(N);
-        System.out.println(result);
-    }
-    public static int factorial(int N){
-        if(N!=0){
-            return N * factorial(N-1);
-        }else{
-            return 1;
-        }
-    }
+	public static BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+	public static BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
+	
+	public static void main(String [] args) throws IOException{
+		int N = Integer.parseInt(br.readLine());
+		
+		bw.write(factorial(N)+"\n");
+		bw.flush();
+		bw.close();
+		br.close();
+	}
+	
+	private static int factorial(int i) {
+		if(i == 0) return 1;
+		if(i == 1) {
+			return 1;
+		}
+		return i * factorial(i-1);
+	}
 }
