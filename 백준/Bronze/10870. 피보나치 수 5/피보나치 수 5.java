@@ -1,25 +1,22 @@
-import java.util.*;
+import java.io.*;
 
 public class Main {
-    public static void main(String[] args) {
-        Scanner kb = new Scanner(System.in);
-        int N = kb.nextInt();
-        kb.close();
-        feat f = new feat();
-        int result = f.fibonacci(N);
-        System.out.println(result);
-    }
-    public static class feat{
-        public int fibonacci(int N){
-            if(N==2){
-                return 1;
-            }else if(N==1){
-                return 1;
-            }else if(N==0){
-                return 0;
-            }else{
-                return fibonacci(N-1)+fibonacci(N-2);
-            }
-        }
-    }
+	private static BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+	private static BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
+	
+	public static void main(String[] args) throws IOException{
+		int [] fibo = new int[21];
+		fibo[0] = 0;
+		fibo[1] = 1;
+	
+		for(int i=2;i<=20;i++) {
+			fibo[i] = fibo[i-2] + fibo[i-1];
+		}
+		
+		int N = Integer.parseInt(br.readLine());
+		bw.write(fibo[N]+"\n");
+		bw.flush();
+		bw.close();
+		br.close();
+	}
 }
