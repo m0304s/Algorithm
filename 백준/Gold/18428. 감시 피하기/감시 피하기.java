@@ -70,7 +70,7 @@ class Main
 		
 		for(int x=i;x<N;x++) {
 			for(int y=0;y<N;y++) {
-				if(x==i&&y<j) continue;
+				if(x == i && y < j) continue;
 				if(map[x][y].equals("X")) {
 					map[x][y] = "O";
 					backtracking(x,y+1,depth+1);
@@ -100,7 +100,7 @@ class Main
 			nx += dx[direction];
 			ny += dy[direction];
 			
-			if(!inRange(nx,ny)) continue;
+			if(!inRange(nx,ny)) break;
 			if(map[nx][ny].equals("O")) break;	//장애물을 만나면 뒷범위는 탐색할 필요가 없음
 			if(map[nx][ny].equals("S")) return true;
 		}
