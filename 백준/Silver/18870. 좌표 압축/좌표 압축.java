@@ -1,32 +1,40 @@
 import java.io.*;
 import java.util.*;
 
-public class Main {
-    static BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-    static BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
-    public static void main(String[] args) throws IOException{
-        int N = Integer.parseInt(br.readLine());
-        String [] tokens = br.readLine().split(" ");
-        ArrayList<Integer> original = new ArrayList<>();
-        ArrayList<Integer> sorted = new ArrayList<>();
-        for (String string : tokens) {
-            int inputNum = Integer.parseInt(string);
-            original.add(inputNum);
-            sorted.add(inputNum);
-        }
-        Collections.sort(sorted);
+class Main {
+    private static BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+    private static BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
 
-        int rank = 0;
-        HashMap<Integer,Integer> answerMap = new HashMap<>();
-        for (Integer integer : sorted) {
-            if(!answerMap.containsKey(integer)){
-                answerMap.put(integer, rank);
-                rank++;
-            }
-        }
-        for (Integer integer : original) {
-            bw.write(answerMap.get(integer)+" ");
-        }bw.write("\n");
+    private static HashMap<Integer, Integer> answerMap;
+
+    public static void main(String[] args) throws IOException {
+    	answerMap = new HashMap<>();
+    	List<Integer> numbers = new ArrayList<>();
+    	List<Integer> sortedNumbers = new ArrayList<>();
+    	int N = Integer.parseInt(br.readLine());
+    	String [] tokens = br.readLine().split(" ");
+    	for(int i=0;i<N;i++) {
+    		int a = Integer.parseInt(tokens[i]);
+    		numbers.add(a);
+    		sortedNumbers.add(a);
+    	}
+    	
+    	Collections.sort(sortedNumbers);
+    	
+    	int rank = 0;
+    	for(int num : sortedNumbers) {
+    		if(!answerMap.containsKey(num)) {
+    			answerMap.put(num, rank);
+    			rank++;
+    		}
+    	}
+    	
+    	for(int key : numbers) {
+    		bw.write(answerMap.get(key)+" ");
+    	}
+    	bw.write("\n");
         bw.flush();
+        bw.close();
+        br.close();
     }
 }
