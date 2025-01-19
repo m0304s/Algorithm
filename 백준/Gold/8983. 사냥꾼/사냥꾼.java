@@ -43,6 +43,7 @@ public class Main {
                 return a1.x - a2.x;
             }
         });
+        Collections.sort(sadae);
 
         int count = 0;
         for(Animal animal : animalList){
