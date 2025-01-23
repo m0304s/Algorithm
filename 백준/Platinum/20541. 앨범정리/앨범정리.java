@@ -3,171 +3,188 @@ import java.util.*;
 
 class Main {
     private static BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+    private static BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
+    
+    private static Map<String, TreeSet<String>> haveFolders;
+    private static Map<String, TreeSet<String>> haveFiles;
+    private static Map<String, String> parentFolder;	//부모 폴더의 경로를 관리
+    private static int N, removeFiles, removeFolders;
     private static String currentFolder;
-    private static int N, removeFolder, removeFile;
-    private static Map<String, TreeSet<String>> haveFolders; // 부모 디렉토리 -> 자식 디렉토리
-    private static Map<String, TreeSet<String>> haveFiles;   // 디렉토리 -> 파일
-    private static Map<String, String> parentFolder;         // 자식 디렉토리 -> 부모 디렉토리
-
-    public static void main(String[] args) throws IOException {
-        currentFolder = "album";
-        haveFolders = new HashMap<>();
-        haveFiles = new HashMap<>();
-        parentFolder = new HashMap<>();
-
-        haveFolders.put("album", new TreeSet<>());
-        haveFiles.put("album", new TreeSet<>());
-        N = Integer.parseInt(br.readLine());
-
-        for (int i = 0; i < N; i++) {
-            String[] commandLineTokens = br.readLine().split(" ");
-            switch (commandLineTokens[0]) {
-                case "mkalb":
-                    createAlbum(commandLineTokens[1]);
-                    break;
-                case "rmalb":
-                    removeFile = 0;
-                    removeFolder = 0;
-                    handleRemoveAlbums(commandLineTokens[1]);
-                    System.out.println(removeFolder + " " + removeFile);
-                    break;
-                case "insert":
-                    insertFile(commandLineTokens[1]);
-                    break;
-                case "delete":
-                    removeFile = 0;
-                    handleDeleteFile(commandLineTokens[1]);
-                    System.out.println(removeFile);
-                    break;
-                case "ca":
-                    changeAlbum(commandLineTokens[1]);
-                    System.out.println(getFolderName(currentFolder));
-                    break;
+    public static void main(String [] args) throws IOException{
+    	haveFolders = new HashMap<>();
+    	haveFiles = new HashMap<>();
+    	parentFolder = new HashMap<>();
+    	currentFolder = "album";
+    	init();
+    	N = Integer.parseInt(br.readLine());
+    	for(int i=0;i<N;i++) {
+    		String [] commandLine = br.readLine().split(" ");
+    		switch(commandLine[0]) {
+    		case "mkalb":
+    			createAlbum(commandLine[1]);
+    			break;
+    		case "rmalb":
+    			removeFiles = 0;
+    			removeFolders = 0;
+    			handleRemoveAlbums(commandLine[1]);
+    			bw.write(removeFolders+" "+ removeFiles+"\n");
+    			break;
+    		case "insert":
+    			insertFile(commandLine[1]);
+    			break;
+    		case "delete":
+    			removeFiles = 0;
+    			removeFolders = 0;
+    			handleDeleteFile(commandLine[1]);
+    			bw.write(removeFiles+"\n");
+    			break;
+    		case "ca":
+    			moveFolder(commandLine[1]);
+    			bw.write(getNowFolder(currentFolder)+"\n");
+    			break;
+    		}
+    	}
+    	bw.flush();
+    	bw.close();
+    	br.close();
+    }
+    
+    private static String getNowFolder(String path) {
+    	String [] tokens = path.split("/");
+    	return tokens[tokens.length-1];
+    }
+    
+    private static void init() {
+    	haveFolders.put(currentFolder, new TreeSet<>());
+    	haveFiles.put(currentFolder, new TreeSet<>());
+    	parentFolder.put("album", "album");
+    }
+    
+    private static void handleRemoveAlbums(String option) {
+    	switch(option) {
+    	case "0":
+    		for (String album : new ArrayList<>(haveFolders.get(currentFolder))) {
+                String fullPath = currentFolder + "/" + album;
+                removeFileAndFolder(fullPath);
             }
-        }
-    }
+            haveFolders.get(currentFolder).clear();
+    		break;
+    	case "-1":	//사전순으로 가장 빠른 디렉토리 삭제
+    		if(!haveFolders.get(currentFolder).isEmpty()) {
+    			String targetFolder = haveFolders.get(currentFolder).first();
+    			String fullPath = currentFolder +"/"+ targetFolder;
+    			removeFileAndFolder(fullPath);
+    			haveFolders.get(currentFolder).remove(targetFolder);
+    		}
+    		break;
+    	case "1":
+    		if(!haveFolders.get(currentFolder).isEmpty()) {
+    			String targetFolder = haveFolders.get(currentFolder).last();
+    			String fullPath = currentFolder + "/"+ targetFolder;
+    			removeFileAndFolder(fullPath);
+    			haveFolders.get(currentFolder).remove(targetFolder);
+    		}
+    		break;
+		default:
+			if(haveFolders.get(currentFolder).contains(option)) {
+				String fullPath = currentFolder + "/" + option;
+				removeFileAndFolder(fullPath);
+				haveFolders.get(currentFolder).remove(option);
+			}
+			break;
+    	}
+	}
 
-    private static String getFolderName(String currentFolder) {
-        String [] tokens = currentFolder.split("/");
-        return tokens[tokens.length-1];
-    }
+	private static void removeFileAndFolder(String key) {
+		if(haveFolders.containsKey(key)) {
+			for(String folder : new ArrayList<>(haveFolders.get(key))) {
+				String fullPath = key + "/" + folder;
+				removeFileAndFolder(fullPath);
+			}
+			
+			haveFolders.remove(key);
+		}
+		
+		if(haveFiles.containsKey(key)) {
+			removeFiles+=haveFiles.get(key).size();
+			haveFiles.remove(key);
+		}
+		
+		removeFolders++;
+	}
 
-    private static void changeAlbum(String target) {
-        switch (target) {
-            case "..": // 상위 디렉토리로 이동
-                if (!currentFolder.equals("album")) {
-                    currentFolder = parentFolder.get(currentFolder);
+	private static void handleDeleteFile(String option) {
+    	switch(option) {
+    	case "-1":	//현재 앨범에 속해있는 사진이 존재한다면, 이름이 사전순으로 가장 빠른 사진을 삭제
+    		if(!haveFiles.get(currentFolder).isEmpty()) {
+    			String targetFile = haveFiles.get(currentFolder).first();
+    			removeFiles++;
+    			haveFiles.get(currentFolder).remove(targetFile);
+    		}
+    		break;
+    	case "0":
+    		int size = haveFiles.get(currentFolder).size();
+    		removeFiles+=size;
+    		haveFiles.get(currentFolder).clear();
+    		break;
+    	case "1":
+    		if(!haveFiles.get(currentFolder).isEmpty()) {
+    			String targetFile = haveFiles.get(currentFolder).last();
+    			removeFiles++;
+    			haveFiles.get(currentFolder).remove(targetFile);
+    		}
+    		break;
+		default:	//현재 앨범에 속해있는 사진 중 S의 이름을 가진 사진이 존재한다면, 해당 사진을 삭제
+    		if(haveFiles.get(currentFolder).contains(option)){
+    			removeFiles++;
+    			haveFiles.get(currentFolder).remove(option);
+    		}
+			break;
+    	}
+    }
+    
+    private static void insertFile(String fileName) throws IOException{
+    	if(haveFiles.get(currentFolder).contains(fileName)) {
+    		bw.write("duplicated photo name\n");
+    		return;
+    	}
+    	
+    	haveFiles.get(currentFolder).add(fileName);
+    	return;
+    }
+    
+    private static void moveFolder(String option) {
+        switch (option) {
+            case "..":
+                if (!parentFolder.containsKey(currentFolder) || currentFolder.equals("album")) {
+                    return;
                 }
+                currentFolder = parentFolder.get(currentFolder);
                 break;
-            case "/": // 최상위 디렉토리로 이동
+            case "/":
                 currentFolder = "album";
                 break;
             default:
-                if (haveFolders.get(currentFolder).contains(target)) {
-                    String newFolder = currentFolder + "/" + target;
-                    currentFolder = newFolder;
+                if (haveFolders.containsKey(currentFolder) &&
+                    haveFolders.get(currentFolder).contains(option)) {
+                    currentFolder = currentFolder + "/" + option;
                 }
                 break;
         }
     }
-
-    private static void handleDeleteFile(String option) {
-        switch (option) {
-            case "-1": // 사전순으로 가장 빠른 파일 삭제
-                if (!haveFiles.get(currentFolder).isEmpty()) {
-                    String fileName = haveFiles.get(currentFolder).first();
-                    haveFiles.get(currentFolder).remove(fileName);
-                    removeFile++;
-                }
-                break;
-            case "0": // 현재 디렉토리의 모든 파일 삭제
-                removeFile += haveFiles.get(currentFolder).size();
-                haveFiles.get(currentFolder).clear();
-                break;
-            case "1": // 사전순으로 가장 마지막 파일 삭제
-                if (!haveFiles.get(currentFolder).isEmpty()) {
-                    String fileName = haveFiles.get(currentFolder).last();
-                    haveFiles.get(currentFolder).remove(fileName);
-                    removeFile++;
-                }
-                break;
-            default: // 특정 파일 삭제
-                if (haveFiles.get(currentFolder).contains(option)) {
-                    haveFiles.get(currentFolder).remove(option);
-                    removeFile++;
-                }
-                break;
-        }
-    }
-
-    private static void handleRemoveAlbums(String option) {
-        switch (option) {
-            case "0": // 현재 디렉토리의 모든 하위 디렉토리 삭제
-                for (String album : new ArrayList<>(haveFolders.get(currentFolder))) {
-                    String fullPath = currentFolder + "/" + album;
-                    removeFileAndFolder(fullPath);
-                }
-                haveFolders.get(currentFolder).clear();
-                break;
-            case "-1": // 사전순으로 가장 빠른 디렉토리 삭제
-                if (!haveFolders.get(currentFolder).isEmpty()) {
-                    String firstAlbum = haveFolders.get(currentFolder).first();
-                    String fullPath = currentFolder + "/" + firstAlbum;
-                    removeFileAndFolder(fullPath);
-                    haveFolders.get(currentFolder).remove(firstAlbum);
-                }
-                break;
-            case "1": // 사전순으로 가장 마지막 디렉토리 삭제
-                if (!haveFolders.get(currentFolder).isEmpty()) {
-                    String lastAlbum = haveFolders.get(currentFolder).last();
-                    String fullPath = currentFolder + "/" + lastAlbum;
-                    removeFileAndFolder(fullPath);
-                    haveFolders.get(currentFolder).remove(lastAlbum);
-                }
-                break;
-            default: // 특정 이름의 디렉토리 삭제
-                if (haveFolders.get(currentFolder).contains(option)) {
-                    String fullPath = currentFolder + "/" + option;
-                    removeFileAndFolder(fullPath);
-                    haveFolders.get(currentFolder).remove(option);
-                }
-                break;
-        }
-    }
-
-    private static void removeFileAndFolder(String key) {
-        if (haveFolders.containsKey(key)) {
-            for (String album : new ArrayList<>(haveFolders.get(key))) {
-                String fullPath = key + "/" + album;
-                removeFileAndFolder(fullPath);
-            }
-            haveFolders.remove(key);
-        }
-
-        if (haveFiles.containsKey(key)) {
-            removeFile += haveFiles.get(key).size();
-            haveFiles.remove(key);
-        }
-        removeFolder++;
-    }
-
-    private static void createAlbum(String albumName) {
-        if (haveFolders.get(currentFolder).contains(albumName)) {
-            System.out.println("duplicated album name");
-        } else {
-            haveFolders.get(currentFolder).add(albumName);
-            String fullPath = currentFolder + "/" + albumName;
-            haveFolders.put(fullPath, new TreeSet<>());
-            haveFiles.put(fullPath, new TreeSet<>());
-            parentFolder.put(fullPath, currentFolder);
-        }
-    }
-
-    private static void insertFile(String fileName) {
-        if (haveFiles.get(currentFolder).contains(fileName)) {
-            System.out.println("duplicated photo name");
-        } else {
-            haveFiles.get(currentFolder).add(fileName);
-        }
+    
+    private static void createAlbum(String folderName) throws IOException{
+    	if(haveFolders.get(currentFolder).contains(folderName)) {
+    		bw.write("duplicated album name\n");
+    		return;
+    	}
+    	
+    	haveFolders.get(currentFolder).add(folderName);
+    	
+    	String fullPath = currentFolder + "/" + folderName;
+    	haveFolders.put(fullPath, new TreeSet<>());
+    	haveFiles.put(fullPath, new TreeSet<>());
+    	parentFolder.put(fullPath, currentFolder);
+    	return;
     }
 }
