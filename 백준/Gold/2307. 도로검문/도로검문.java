@@ -30,7 +30,6 @@ class Main {
     }
     
     private static int N,M;
-    private static List<Integer> minDistanceNodeList;
     private static ArrayList<ArrayList<Node>> graph;
     
     public static void main(String [] args) throws IOException{
@@ -38,7 +37,6 @@ class Main {
     	N = Integer.parseInt(tokens[0]);
     	M = Integer.parseInt(tokens[1]);
     	graph = new ArrayList<>();
-    	minDistanceNodeList = new ArrayList<>();	//검문이 없을 때 지나가는 노드를 저장
     	for(int i=0;i<=N;i++) {
     		graph.add(new ArrayList<>());
     	}
@@ -66,16 +64,13 @@ class Main {
             int blockA = path.get(i);
             int blockB = path.get(i + 1);
             
-            // 차단할 간선을 graph에서 찾아 삭제
             Node removedFromA = null, removedFromB = null;
-            // blockA의 인접리스트에서 blockB로 가는 간선 찾기
             for (Node node : graph.get(blockA)) {
                 if (node.idx == blockB) {
                     removedFromA = node;
                     break;
                 }
             }
-            // blockB의 인접리스트에서 blockA로 가는 간선 찾기
             for (Node node : graph.get(blockB)) {
                 if (node.idx == blockA) {
                     removedFromB = node;
@@ -83,23 +78,18 @@ class Main {
                 }
             }
             
-            // 만약 간선이 존재하지 않으면(정상적이지 않은 경우) 다음 간선으로
             if (removedFromA == null || removedFromB == null) {
                 continue;
             }
             
-            // 간선 제거(차단)
             graph.get(blockA).remove(removedFromA);
             graph.get(blockB).remove(removedFromB);
             
-            // 차단 상태에서 다익스트라 수행
             Result resultWithBlock = dijkstra(1, N);
             int timeWithBlock = resultWithBlock.distance;
-            
-            // 도착점에 도달할 수 없으면 unreachable 플래그 설정
+
             if(timeWithBlock == Integer.MAX_VALUE) {
                 unreachable = true;
-                // 차단한 간선을 복구한 후 바로 종료
                 graph.get(blockA).add(removedFromA);
                 graph.get(blockB).add(removedFromB);
                 break;
@@ -107,12 +97,10 @@ class Main {
             
             maxDelay = Math.max(maxDelay, timeWithBlock - minTime);
             
-            // 차단했던 간선 복구
             graph.get(blockA).add(removedFromA);
             graph.get(blockB).add(removedFromB);
         }
         
-        // 결과 출력: 도착 불가능한 경우 -1, 그렇지 않으면 최대 지연시간 출력
         if(unreachable) {
             bw.write(-1+"\n");
         } else {
