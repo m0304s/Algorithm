@@ -13,17 +13,7 @@ class Main {
 			this.y = y;
 		}
 	}
-	
-	private static class Command{
-		int time;
-		String dir;
-		
-		public Command(int time, String dir) {
-			this.time = time;
-			this.dir = dir;
-		}
-	}
-	
+
 	//우 하 좌 상
 	private static int [] dx = {0,1,0,-1};
 	private static int [] dy = {1,0,-1,0};
