@@ -1,83 +1,80 @@
 import java.io.*;
 import java.util.*;
 
-public class Main {
-    static int [][] map;
-    static int N, houseCnt=0;
-    static boolean [][] visited;
-    
-    //상하좌우
-    static int [] dx = {-1,0,1,0};
-    static int [] dy = {0,1,0,-1};
+public class Main{
+    private static final int [] dx = {0,0,1,-1};
+    private static final int [] dy = {-1,1,0,0};
+    private static final int HOUSE = 1, BLANK = 0;
 
-    static class Node{
-        int x;
-        int y;
+    private static BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+    private static BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
+
+    private static int N;
+    private static int [][] map;
+    private static boolean [][] visited;
+    private static class Node{
+        int x,y;
         public Node(int x,int y){
             this.x = x;
             this.y = y;
         }
-        public int getX(){
-            return x;
-        }
-        public int getY(){
-            return y;
-        }
     }
 
     public static void main(String[] args) throws IOException{
-        ArrayList<Integer> list = new ArrayList<>();
-        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
-        
         N = Integer.parseInt(br.readLine());
         map = new int[N][N];
         visited = new boolean[N][N];
         for(int i=0;i<N;i++){
-            String line = br.readLine();
+            String input = br.readLine();
             for(int j=0;j<N;j++){
-                map[i][j] = (int)line.charAt(j)-'0';
+                map[i][j] = input.charAt(j)-'0';
             }
         }
+
+        int houseCnt = 0;
+        int count = 0;
+        List<Integer> answer = new ArrayList<>();
         for(int i=0;i<N;i++){
             for(int j=0;j<N;j++){
-                if(map[i][j] == 1 && !visited[i][j]){
-                    houseCnt=0;
-                    bfs(i,j);
-                    list.add(houseCnt);
+                if(map[i][j] == HOUSE && !visited[i][j]){
+                    count++;
+                    houseCnt = bfs(i,j);
+                    answer.add(houseCnt);
                 }
             }
         }
-        Collections.sort(list);
-        bw.write(list.size()+"\n");
-        for(int i : list){
-            bw.write(i+"\n");
+        bw.write(count+"\n");
+        Collections.sort(answer);
+        for (Integer integer : answer) {
+            bw.write(integer+"\n");
         }
         bw.flush();
+        bw.close();
+        br.close();
     }
-    public static void bfs(int x, int y){
-        Queue<Node> q = new LinkedList<>();
-        q.add(new Node(x, y));
+
+    private static int bfs(int x,int y){
+        Queue<Node> queue = new LinkedList<>();
+        queue.add(new Node(x, y));
         visited[x][y] = true;
+        int cnt = 0;
+        while(!queue.isEmpty()){
+            Node curNode = queue.poll();
+            cnt++;
+            for(int d=0;d<4;d++){
+                int nx = curNode.x + dx[d];
+                int ny = curNode.y + dy[d];
 
-        while(!q.isEmpty()){
-            Node now = q.poll();
-            houseCnt++;
-            for(int i=0;i<4;i++){
-                int nextX = now.getX() + dx[i];
-                int nextY = now.getY() + dy[i];
+                if(!inRange(nx,ny) || visited[nx][ny] || map[nx][ny] == BLANK) continue;
 
-                //다음 좌표가 MAP 범위를 벗어날 경우
-                if(nextX < 0 || nextX >= N || nextY < 0 || nextY >=N){
-                    continue;
-                }
-                // 이미 방문한 곳이거나, 집이 아닌 경우
-                if(map[nextX][nextY] == 0 || visited[nextX][nextY]){
-                    continue;
-                }
-                q.add(new Node(nextX, nextY));
-                visited[nextX][nextY] = true;
+                queue.add(new Node(nx, ny));
+                visited[nx][ny] = true;
             }
         }
+        return cnt;
+    }
+
+    private static boolean inRange(int x,int y){
+        return x >= 0 && x < N && y >= 0 && y < N;
     }
 }
