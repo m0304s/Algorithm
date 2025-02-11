@@ -1,51 +1,51 @@
 import java.io.*;
-import java.util.LinkedList;
-import java.util.Queue;
+import java.util.*;
 
 public class Main {
-    static BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-    static BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
+    private static BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+    private static BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
 
-    static int [][] graph;
-    static int computers;
-
-    public static void main(String[] args) throws IOException {
-        computers = Integer.parseInt(br.readLine());
-        graph = new int[computers+1][computers+1];
-
+    private static ArrayList<ArrayList<Integer>> graph;
+    private static int N;
+    public static void main(String[] args) throws IOException{
+        graph = new ArrayList<>();
+        N = Integer.parseInt(br.readLine());
+        for(int i=0;i<=N;i++){
+            graph.add(new ArrayList<>());
+        }
         int M = Integer.parseInt(br.readLine());
         for(int i=0;i<M;i++){
             String [] tokens = br.readLine().split(" ");
-            int v1 = Integer.parseInt(tokens[0]);
-            int v2 = Integer.parseInt(tokens[1]);
+            int a = Integer.parseInt(tokens[0]);
+            int b = Integer.parseInt(tokens[1]);
 
-            graph[v1][v2] = 1;
-            graph[v2][v1] = 1;
+            graph.get(a).add(b);
+            graph.get(b).add(a);
         }
-
-        int answer = bfs()-1;
-        bw.write(answer+"\n");
+        int answer = bfs(1, new boolean[N+1]);
+        bw.write(answer-1+"\n");
         bw.flush();
         bw.close();
+        br.close();
     }
-    private static int bfs(){
-        int virusCount = 0;
-        Queue<Integer> q = new LinkedList<>();
-        boolean[] visited = new boolean[computers+1];
-        visited[1] = true;
-        q.add(1);
 
-        while(!q.isEmpty()){
-            int node = q.poll();
-            virusCount++;
+    private static int bfs(int start, boolean [] visited){
+        int count = 0;
+        Queue<Integer> queue = new LinkedList<>();
+        visited[start] = true;
+        queue.add(start);
 
-            for(int i=0;i<computers+1;i++){
-                if(graph[node][i] == 1 && !visited[i]){
-                    visited[i] = true;
-                    q.add(i);
-                }
+        while(!queue.isEmpty()){
+            int curNode = queue.poll();
+            count++;
+
+            for(int nextNode : graph.get(curNode)){
+                if(visited[nextNode]) continue;
+
+                visited[nextNode] = true;
+                queue.add(nextNode);
             }
         }
-        return virusCount;
+        return count;
     }
 }
