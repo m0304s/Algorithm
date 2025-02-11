@@ -1,81 +1,78 @@
 import java.io.*;
 import java.util.*;
 
-public class Main {
-    static int N, M;
-    static int [][] map;
-    static boolean [][] visited;
-    static int [] dx = {1,0,-1,0};
-    static int [] dy = {0,1,0,-1};
+public class Main{
+    private static final int WALL = '0', BLANK = '1';
+    private static final int [] dx = {0,0,-1,1};
+    private static final int [] dy = {-1,1,0,0};
 
-    static class Node{
-        int x;
-        int y;
-        int dept;
-        public Node(int x,int y, int dept){
+    private static BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+    private static BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
+
+    private static int N,M;
+    private static char [][] map;
+
+    private static class Node{
+        int x,y,depth;
+        public Node(int x,int y, int depth){
             this.x = x;
             this.y = y;
-            this.dept = dept;
+            this.depth = depth;
         }
         public Node(){
 
         }
-        public int getX(){
-            return x;
-        }
-        public int getY(){
-            return y;
-        }
-        public int getDept(){
-            return dept;
-        }
     }
-    public static void main(String[] args) throws IOException{
-        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
 
+    public static void main(String[] args) throws IOException{
         String [] tokens = br.readLine().split(" ");
         N = Integer.parseInt(tokens[0]);
         M = Integer.parseInt(tokens[1]);
 
-        map = new int[N][M];
-        visited = new boolean[N][M];
+        map = new char[N][M];
 
         for(int i=0;i<N;i++){
-            String line = br.readLine();
+            String input = br.readLine();
             for(int j=0;j<M;j++){
-                map[i][j] = (int)line.charAt(j)-'0';
+                map[i][j] = input.charAt(j);
             }
         }
-        
-        Node answer = bfs(0,0);
-        bw.write(answer.getDept()+"\n");
+
+        int answer = bfs(0,0, new boolean[N][M]).depth;
+        bw.write(answer+"\n");
         bw.flush();
+        bw.close();
+        br.close();
     }
-    public static Node bfs(int x,int y){
+
+    public static Node bfs(int x,int y, boolean [][] visited){
         Queue<Node> q = new LinkedList<>();
         q.offer(new Node(x, y, 1));
         Node answer = new Node();
         while (!q.isEmpty()) {
             Node now = q.poll();
-            if(now.getX()==(N-1) && now.getY() == (M-1)){
+            if(now.x==(N-1) && now.y == (M-1)){
                 answer = now;
                 break;
             }
             for(int i=0;i<4;i++){
-                int nextX = now.getX()+dx[i];
-                int nextY = now.getY()+dy[i];
+                int nextX = now.x+dx[i];
+                int nextY = now.y+dy[i];
 
                 if(nextX < 0 || nextX >= N || nextY < 0 || nextY >= M){
                     continue;
                 }
-                if(map[nextX][nextY] == 0 || visited[nextX][nextY]){
+                if(map[nextX][nextY] == WALL || visited[nextX][nextY]){
                     continue;
                 }
-                q.offer(new Node(nextX, nextY, now.getDept()+1));
+                q.offer(new Node(nextX, nextY, now.depth+1));
                 visited[nextX][nextY] = true;
             }
         }
         return answer;
+    }
+
+    private static boolean inRange(int x,int y){
+        return x >= 0 && x < N && y >= 0 && y < M;
     }
 }
