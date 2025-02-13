@@ -2,12 +2,16 @@ import java.io.*;
 import java.util.*;
 
 public class Solution {
+	private static final int [] dx = {0,0,-1,1};
+	private static final int [] dy = {-1,1,0,0};
+	
 	private static BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 	private static BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
-	private static int [][] map;
-	private static int [] dx = {0,0,-1,1};
-	private static int [] dy = {-1,1,0,0};
+	
 	private static int N;
+	private static int [][] map;
+	private static int [][] dist;
+	
 	private static class Node implements Comparable<Node>{
 		int x,y,cost;
 		
@@ -36,6 +40,7 @@ public class Solution {
 	private static int solution() throws IOException{
 		N = Integer.parseInt(br.readLine());
 		map = new int[N][N];
+		dist = new int[N][N];
 		
 		for(int i=0;i<N;i++) {
 			String input = br.readLine();
@@ -43,27 +48,18 @@ public class Solution {
 				map[i][j] = input.charAt(j)-'0';
 			}
 		}
-		
-		int dist = dijkstra(0,0);
-		return dist;
-	}
-	
-	
-	private static int dijkstra(int x,int y) {
 		PriorityQueue<Node> pq = new PriorityQueue<>();
-		int [][] dist = new int[N][N];
+		pq.add(new Node(0,0,0));
 		
-		for(int [] arr : dist) {			
-			Arrays.fill(arr, Integer.MAX_VALUE);
+		for(int i=0;i<N;i++) {
+			Arrays.fill(dist[i], Integer.MAX_VALUE);
 		}
-		dist[x][y] = 0;
-		pq.add(new Node(x,y,0));
 		
+		dist[0][0] = 0;
 		while(!pq.isEmpty()) {
-			Node curNode = pq.poll();
+			Node curNode = pq.poll(); 
 			
 			if(curNode.cost > dist[curNode.x][curNode.y]) continue;
-			
 			for(int d=0;d<4;d++) {
 				int nx = curNode.x + dx[d];
 				int ny = curNode.y + dy[d];
@@ -83,3 +79,4 @@ public class Solution {
 		return x >= 0 && x < N && y >= 0 && y < N;
 	}
 }
+
