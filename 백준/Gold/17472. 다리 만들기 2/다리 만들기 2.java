@@ -154,15 +154,6 @@ public class Main {
 
         return dist;
     }
-    private static void debug(){
-        for (int i=0;i<N;i++){
-            for(int j=0;j<M;j++){
-                System.out.print(map[i][j]+" ");
-            }
-            System.out.println();
-        }
-    }
-
     private static int findIsland(){
         int islandCnt = 1;
         for(int i=0;i<N;i++){
