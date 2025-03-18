@@ -2,52 +2,58 @@ import java.io.*;
 import java.util.*;
 
 public class Main {
-    public static BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-    public static BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
+    static BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+    static BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
 
-    public static void main(String[] args) throws IOException{
-        String [] nc = br.readLine().split(" ");
-        int N = Integer.parseInt(nc[0]);
-        int C = Integer.parseInt(nc[1]);
+    static int N, C;
+    static int[] house;
 
-        int [] list = new int[N];
-        for(int i=0;i<N;i++){
-            list[i] = Integer.parseInt(br.readLine());
+    public static void main(String[] args) throws IOException {
+        String[] tokens = br.readLine().split(" ");
+        N = Integer.parseInt(tokens[0]); // 집의 개수
+        C = Integer.parseInt(tokens[1]); // 설치할 공유기의 개수
+
+        house = new int[N];
+
+        for (int i = 0; i < N; i++) {
+            house[i] = Integer.parseInt(br.readLine());
         }
 
-        // C개의 공유기를 N개의 집에 적당히 설치해서, 가장 인접한 두 공유기 사이의 거리를 최대로 하는 프로그램을 작성하시오.
-        Arrays.sort(list);
+        Arrays.sort(house);
 
         int left = 1;
-        int right = list[list.length-1]-list[0]+1;
+        int right = house[N - 1] - house[0];
+        int result = 0;
 
-        while(left<right){
-            int mid = (left+right)/2;
-            if(C>numHouse(mid,list,N)){    //설치할 수 있는 공유기 개수 > 설치해야하는 공유기 개수 : 거리를 줄여야함
-                right = mid;
-            }else{
+        while (left <= right) {
+            int mid = (left + right) / 2;
+            int installCnt = search(mid);
+
+            if (installCnt < C) {
+                right = mid - 1;
+            } else {
+                result = mid;
                 left = mid + 1;
             }
         }
-        bw.write(Integer.toString(right-1)+"\n");
+
+        bw.write(result + "\n");
         bw.flush();
         bw.close();
+        br.close();
     }
 
-    private static int numHouse(int length, int[] list,int N) {  //거리가 주어졌을때, 설치할 수 있는 최대 공유기 개수
-        int startIdx = 0;
-        int endIdx = 0;
-        int answer = 1;
+    private static int search(int length) {
+        int count = 1; // 첫 번째 집에는 무조건 공유기 설치
+        int lastInstalled = house[0]; // 마지막으로 공유기를 설치한 위치
 
-        while (endIdx!=N) {
-            if(list[endIdx]-list[startIdx]<length){
-                endIdx++;
-            }else{
-                startIdx = endIdx;
-                endIdx++;
-                answer++;
+        for (int i = 1; i < N; i++) {
+            if (house[i] - lastInstalled >= length) {
+                count++;
+                lastInstalled = house[i]; // 공유기 설치
             }
         }
-        return answer;
+
+        return count;
     }
 }
