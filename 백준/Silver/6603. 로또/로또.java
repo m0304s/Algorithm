@@ -1,45 +1,46 @@
 import java.io.*;
-import java.util.ArrayList;
-import java.util.List;
 
 public class Main {
     static BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
     static BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
-    static List<Integer> numbers;
-    static int [] output;
-    static int K;
-
-    public static void main(String[] args) throws IOException {
-        while(true){
-            String [] tokens = br.readLine().split(" ");
-            if(Integer.parseInt(tokens[0]) == 0) break;
-            K = Integer.parseInt(tokens[0]);
-            numbers = new ArrayList<>();
-            output = new int[6];
-            for(int i=1;i<tokens.length;i++){
-                numbers.add(Integer.parseInt(tokens[i]));
-            }
-
-            combination(0,0);
-            bw.write("\n");
-        }
-        bw.flush();
-        bw.close();
-        br.close();
+    
+    static int [] arr;
+    static int [] dist;
+    
+    public static void main(String [] ars) throws IOException{
+    	while(true) {
+    		String [] tokens = br.readLine().split(" ");
+    		int numOfNums = Integer.parseInt(tokens[0]);
+    		if(numOfNums == 0) break;
+    		
+    		arr = new int[numOfNums];
+    		for(int i=1;i<tokens.length;i++) {
+    			arr[i-1] = Integer.parseInt(tokens[i]);
+    		}
+    		dist = new int[6];
+    		backtracking(0,0,numOfNums);
+    		bw.write("\n");
+    	}
+    	bw.flush();
+    	bw.close();
+    	br.close();
     }
-
-    private static void combination(int depth, int index) throws IOException{
-        if(depth == 6){
-            String answer = "";
-            for (int i : output) {
-                answer+=i+" ";
-            }
-            bw.write(answer+"\n");
-            return;
-        }
-        if(index >= K) return;
-        output[depth] = numbers.get(index);
-        combination(depth+1,index+1);
-        combination(depth,index+1);
+    
+    static void backtracking(int index, int depth, int numOfNums) throws IOException{
+    	if(depth == 6) {
+    		for(int i=0;i<dist.length;i++) {
+    			bw.write(dist[i]+" ");
+    		}bw.write("\n");
+    		
+    		return;
+    	}
+    	
+    	if(index >= numOfNums) return;
+    	
+    	dist[depth] = arr[index];
+    	backtracking(index+1, depth+1, numOfNums);
+    	
+    	
+    	backtracking(index+1,depth,numOfNums);
     }
 }
