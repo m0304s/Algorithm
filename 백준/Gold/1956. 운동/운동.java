@@ -1,77 +1,62 @@
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.util.StringTokenizer;
- 
+import java.io.*;
+import java.util.Arrays;
+
 public class Main {
-    static final int INF = 987654321;
- 
-    public static void main(String[] args) throws NumberFormatException, IOException {
-        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
-        StringTokenizer st = new StringTokenizer(br.readLine());
- 
-        int V = Integer.parseInt(st.nextToken());
-        int E = Integer.parseInt(st.nextToken());
- 
-        int[][] arr = new int[V + 1][V + 1];
- 
+    private static BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+    private static BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
+    private static final int MAX = 987654321;
+    private static int V, E;
+    private static int[][] cost;
+
+    public static void main(String[] args) throws IOException {
+        String[] tokens = br.readLine().split(" ");
+        V = Integer.parseInt(tokens[0]);
+        E = Integer.parseInt(tokens[1]);
+        cost = new int[V + 1][V + 1];
+
+        // 초기화
         for (int i = 1; i <= V; i++) {
-            for (int j = 1; j <= V; j++) {
-                if (i != j) {
-                    arr[i][j] = INF;
-                }
-            }
+            Arrays.fill(cost[i], MAX);
+            cost[i][i] = 0;
         }
- 
+
+        // 간선 정보 입력
         for (int i = 0; i < E; i++) {
-            st = new StringTokenizer(br.readLine());
-            int a = Integer.parseInt(st.nextToken());
-            int b = Integer.parseInt(st.nextToken());
-            int c = Integer.parseInt(st.nextToken());
- 
-            arr[a][b] = c;
+            tokens = br.readLine().split(" ");
+            int a = Integer.parseInt(tokens[0]);
+            int b = Integer.parseInt(tokens[1]);
+            int c = Integer.parseInt(tokens[2]);
+
+            cost[a][b] = c;
         }
- 
-        // 플로이드 와샬 알고리즘 수행
+
+        // 플로이드-워셜 알고리즘
         for (int k = 1; k <= V; k++) {
             for (int i = 1; i <= V; i++) {
                 for (int j = 1; j <= V; j++) {
-                    if (i == j) {
-                        continue;
-                    }
- 
-                    if (arr[i][j] > arr[i][k] + arr[k][j]) {
-                        arr[i][j] = arr[i][k] + arr[k][j];
+                    if (cost[i][j] > cost[i][k] + cost[k][j]) {
+                        cost[i][j] = cost[i][k] + cost[k][j];
                     }
                 }
             }
         }
- 
-        int ans = INF;
+
+        // 최소 사이클 찾기
+        int ans = MAX;
         for (int i = 1; i <= V; i++) {
             for (int j = 1; j <= V; j++) {
-                if (i == j) {
-                    continue;
-                }
- 
-                // 자기 자신을 제외한 두 정점이
-                // 서로에게 가는 경로가 있다면, 사이클이 존재한다는 뜻.
-                if (arr[i][j] != INF && arr[j][i] != INF) {
-                    ans = Math.min(ans, arr[i][j] + arr[j][i]);
+                if(i == j) continue;
+                if (cost[i][j] != MAX && cost[j][i] != MAX) {
+                    ans = Math.min(ans, cost[i][j] + cost[j][i]);
                 }
             }
         }
- 
-        // ans가 초기값이면 사이클이 존재하지 않음.
-        ans = (ans == INF) ? -1 : ans;
- 
-        bw.write(ans + "\n");
+
+        if (ans == MAX) bw.write("-1\n");
+        else bw.write(ans + "\n");
+
         bw.flush();
         bw.close();
         br.close();
     }
- 
 }
