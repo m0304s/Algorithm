@@ -60,9 +60,9 @@ public class Main {
     	
     	if(rootA != rootB) {
     		if(rootA < rootB) {
-    			parents[rootB] = rootA;
-    		}else {
     			parents[rootA] = rootB;
+    		}else {
+    			parents[rootB] = rootA;
     		}
     	}
     }
