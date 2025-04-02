@@ -25,6 +25,7 @@ public class Solution {
         int maxHouse = 0;
         map = new int[N][N];
 
+        // 지도 입력
         for (int i = 0; i < N; i++) {
             tokens = br.readLine().split(" ");
             for (int j = 0; j < N; j++) {
@@ -34,6 +35,8 @@ public class Solution {
         
         for (int k = 1; k <= 2 * N; k++) { 
             int cost = k * k + (k - 1) * (k - 1);
+            // 만약 최대 매출(모든 집이 있는 경우)이 cost보다 작다면, 이후 k는 이익 조건을 만족할 수 없음.
+            if (N * N * M < cost) continue;
             
             for (int i = 0; i < N; i++) {
                 for (int j = 0; j < N; j++) {
