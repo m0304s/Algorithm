@@ -1,4 +1,5 @@
 import java.io.*;
+import java.util.*;
 
 public class Solution {
     static BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
@@ -9,7 +10,6 @@ public class Solution {
 
     public static void main(String[] args) throws IOException {
         int T = Integer.parseInt(br.readLine());
-        
         for (int t = 1; t <= T; t++) {
             bw.write("#" + t + " " + solution() + "\n");
         }
@@ -33,14 +33,15 @@ public class Solution {
             }
         }
         
-        for (int k = 1; k <= 2 * N; k++) { 
+        for (int k = 1; k <= N+1; k++) { 
             int cost = k * k + (k - 1) * (k - 1);
-            // 만약 최대 매출(모든 집이 있는 경우)이 cost보다 작다면, 이후 k는 이익 조건을 만족할 수 없음.
+            // 만약 그리드 전체의 최대 매출이 cost보다 작다면 더 이상 의미가 없음
             if (N * N * M < cost) continue;
             
             for (int i = 0; i < N; i++) {
                 for (int j = 0; j < N; j++) {
-                    int houseCnt = calcHouseInRange(i, j, k); // (i,j)를 중심으로 k 범위 내 집 개수
+                    // BFS를 이용하여 (i,j)를 중심으로 마름모 범위 내 집 개수 계산
+                    int houseCnt = calcHouseInRangeBFS(i, j, k);
                     int profit = houseCnt * M - cost;
                     if (profit >= 0) {
                         maxHouse = Math.max(maxHouse, houseCnt);
@@ -52,14 +53,31 @@ public class Solution {
         return maxHouse;
     }
 
-    private static int calcHouseInRange(int x, int y, int k) {
+    // BFS로 (x,y)를 중심으로 맨해튼 거리 k-1 이하인 영역(마름모)의 집 개수를 세는 메서드
+    private static int calcHouseInRangeBFS(int x, int y, int k) {
         int houseCnt = 0;
-        for (int dx = -k + 1; dx < k; dx++) {
-            for (int dy = - (k - 1 - Math.abs(dx)); dy <= (k - 1 - Math.abs(dx)); dy++) {
-                int nx = x + dx;
-                int ny = y + dy; 
-                if (inRange(nx, ny) && map[nx][ny] == 1) {
-                    houseCnt++;
+        boolean[][] visited = new boolean[N][N];
+        Queue<Point> queue = new LinkedList<>();
+        
+        // 시작점: (x, y)에서 거리 0부터 시작
+        queue.add(new Point(x, y, 0));
+        visited[x][y] = true;
+        
+        while (!queue.isEmpty()) {
+            Point cur = queue.poll();
+            // 현재 위치가 집이면 카운트 증가
+            if (map[cur.x][cur.y] == 1) {
+                houseCnt++;
+            }
+            // 거리가 k-1에 도달하면 더 확장하지 않음
+            if (cur.dist == k - 1) continue;
+            // 4방 탐색 (상, 하, 좌, 우)
+            for (int[] d : new int[][]{{-1,0}, {1,0}, {0,-1}, {0,1}}) {
+                int nx = cur.x + d[0];
+                int ny = cur.y + d[1];
+                if (inRange(nx, ny) && !visited[nx][ny]) {
+                    visited[nx][ny] = true;
+                    queue.add(new Point(nx, ny, cur.dist + 1));
                 }
             }
         }
@@ -68,5 +86,15 @@ public class Solution {
 
     private static boolean inRange(int x, int y) {
         return x >= 0 && x < N && y >= 0 && y < N;
+    }
+
+    // BFS 탐색을 위한 좌표와 거리를 저장하는 내부 클래스
+    private static class Point {
+        int x, y, dist;
+        public Point(int x, int y, int dist) {
+            this.x = x;
+            this.y = y;
+            this.dist = dist;
+        }
     }
 }
