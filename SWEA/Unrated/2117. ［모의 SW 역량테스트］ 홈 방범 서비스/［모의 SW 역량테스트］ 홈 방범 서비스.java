@@ -33,7 +33,7 @@ public class Solution {
             }
         }
         
-        for (int k = 1; k <= N+1; k++) { 
+        for (int k = 1; k <= 22; k++) { 
             int cost = k * k + (k - 1) * (k - 1);
             // 만약 그리드 전체의 최대 매출이 cost보다 작다면 더 이상 의미가 없음
             if (N * N * M < cost) continue;
@@ -87,8 +87,7 @@ public class Solution {
     private static boolean inRange(int x, int y) {
         return x >= 0 && x < N && y >= 0 && y < N;
     }
-
-    // BFS 탐색을 위한 좌표와 거리를 저장하는 내부 클래스
+    
     private static class Point {
         int x, y, dist;
         public Point(int x, int y, int dist) {
