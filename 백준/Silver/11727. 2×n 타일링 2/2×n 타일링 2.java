@@ -1,28 +1,17 @@
+import java.util.*;
 import java.io.*;
 public class Main {
-    public static void main(String[] args) throws IOException{
-        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
+	static BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+	static BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
+	public static void main(String[] args) throws IOException{
+		int N = Integer.parseInt(br.readLine());
+		int [] dp = new int[N+2];
+		dp[1] = 1;
+		dp[2] = 3;
 
-        int N = Integer.parseInt(br.readLine());
-
-        if (N <= 1) {
-            bw.write("1\n");
-            bw.flush();
-            bw.close();
-            br.close();
-            return;
-        }
-        int [] answer = new int[N+1];
-        answer[0] = 1;
-        answer[1] = 1;
-        for(int i=2;i<=N;i++){
-            answer[i] = (answer[i-1] + 2 * answer[i-2])%10007;
-        }
-
-        bw.write(answer[N]+"\n");
-        bw.flush();
-        bw.close();
-        br.close();
-    }
+		for(int i=3;i<=N;i++) {
+			dp[i] = (dp[i-2]*2 + dp[i-1])%10007;
+		}
+		System.out.println(dp[N]);
+	}
 }
