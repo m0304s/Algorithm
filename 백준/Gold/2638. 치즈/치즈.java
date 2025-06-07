@@ -26,10 +26,10 @@ public class Main {
 
         int time = 0;
 
+        // 치즈가 남아있는 동안 반복
         while(checkCheeseRemains()){
-            markOutsideAir();
-            melt();
-            time++;
+            melt(); // 치즈 녹이기
+            time++; // 시간 증가
         }
         bw.write(time+"\n");
         bw.flush();
@@ -37,63 +37,59 @@ public class Main {
         br.close();
     }
 
-    private static void markOutsideAir() {
-        for (int i = 0; i < R; i++) {
-            for (int j = 0; j < C; j++) {
-                if (map[i][j] == -1) map[i][j] = BLANK;
-            }
-        }
-
-        boolean[][] visited = new boolean[R][C];
+    private static void melt(){
+        // 매 시간마다 외부 공기 영역을 다시 탐색 (BFS)
         Queue<Node> queue = new ArrayDeque<>();
-        queue.add(new Node(0, 0));
-        visited[0][0] = true;
+        boolean [][] visitedAir = new boolean[R][C]; // 외부 공기 탐색을 위한 방문 배열
+        List<Node> melts = new ArrayList<>(); // 이번 턴에 녹을 치즈 리스트
 
-        while (!queue.isEmpty()) {
-            Node cur = queue.poll();
-            map[cur.x][cur.y] = -1; // 외부 공기 마킹
+        // (0,0)은 항상 외부 공기라고 가정하고 BFS 시작
+        queue.add(new Node(0,0));
+        visitedAir[0][0] = true;
 
-            for (int d = 0; d < 4; d++) {
-                int nx = cur.x + dx[d];
-                int ny = cur.y + dy[d];
+        while(!queue.isEmpty()){
+            Node curNode = queue.poll();
 
-                if (!inRange(nx, ny) || visited[nx][ny]) continue;
-                if (map[nx][ny] != BLANK) continue;
+            for(int d=0;d<4;d++){
+                int nx = curNode.x + dx[d];
+                int ny = curNode.y + dy[d];
 
-                visited[nx][ny] = true;
-                queue.add(new Node(nx, ny));
-            }
-        }
-    }
+                if(!inRange(nx,ny) || visitedAir[nx][ny]) continue;
 
-    private static void melt() {
-        List<Node> melts = new ArrayList<>();
-
-        for (int i = 0; i < R; i++) {
-            for (int j = 0; j < C; j++) {
-                if (map[i][j] == CHEESE && isTargetMelt(i, j)) {
-                    melts.add(new Node(i, j));
+                if(map[nx][ny] == BLANK){ // 인접한 칸이 공기라면 외부 공기 영역 계속 탐색
+                    visitedAir[nx][ny] = true;
+                    queue.add(new Node(nx,ny));
                 }
             }
         }
 
-        for (Node node : melts) {
+        // 모든 치즈 칸을 돌면서 외부 공기와 2칸 이상 접촉하는지 확인
+        for(int i=0; i<R; i++){
+            for(int j=0; j<C; j++){
+                if(map[i][j] == CHEESE){
+                    int externalAirContactCount = 0;
+                    for(int d=0; d<4; d++){
+                        int nx = i + dx[d];
+                        int ny = j + dy[d];
+
+                        if(inRange(nx, ny) && visitedAir[nx][ny]){ // 인접 칸이 범위 내에 있고, 외부 공기라면
+                            externalAirContactCount++;
+                        }
+                    }
+                    if(externalAirContactCount >= 2){ // 외부 공기와 2칸 이상 접촉하면 녹을 치즈로 추가
+                        melts.add(new Node(i,j));
+                    }
+                }
+            }
+        }
+
+        // 녹을 치즈들을 실제로 녹이기
+        for(Node node : melts){
             map[node.x][node.y] = BLANK;
         }
     }
 
-
-    private static boolean isTargetMelt(int x, int y) {
-        int count = 0;
-        for (int d = 0; d < 4; d++) {
-            int nx = x + dx[d];
-            int ny = y + dy[d];
-            if (!inRange(nx, ny)) continue;
-            if (map[nx][ny] == -1) count++; // 외부 공기인 경우만 카운트
-        }
-        return count >= 2;
-    }
-
+    // 모든 치즈가 녹았는지 확인
     private static boolean checkCheeseRemains(){
         for(int i=0;i<R;i++){
             for(int j=0;j<C;j++){
@@ -103,10 +99,12 @@ public class Main {
         return false;
     }
 
+    // 맵 범위 확인
     private static boolean inRange(int x,int y){
         return x >= 0 && x < R && y >= 0 && y < C;
     }
 
+    // 좌표를 나타내는 Node 클래스
     static class Node{
         int x,y;
         public Node(int x,int y){
