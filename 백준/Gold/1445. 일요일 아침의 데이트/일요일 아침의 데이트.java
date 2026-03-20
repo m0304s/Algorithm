@@ -8,11 +8,12 @@ public class Main {
 	static int N, M;
 	static char [][] map;
 	static boolean [][] visited;
+	static boolean [][] isNearGarbage;
 	
 	static int [] dx = {-1,1,0,0};
 	static int [] dy = {0,0,-1,1};
 	
-	static Node start, end; 
+	static Node start, end;
 	
 	public static void main(String [] args) throws IOException{
 		String [] tokens = br.readLine().split(" ");
@@ -21,6 +22,7 @@ public class Main {
 		
 		map = new char[N][M];
 		visited = new boolean[N][M];
+		isNearGarbage = new boolean[N][M];
 		
 		for(int i=0;i<N;i++) {
 			String input = br.readLine();
@@ -34,6 +36,8 @@ public class Main {
 				}
 			}
 		}
+		
+		checkIsNearGarbage();
 		
 		PriorityQueue<Node> pq = new PriorityQueue<>();
 		pq.add(start);
@@ -75,19 +79,25 @@ public class Main {
 		br.close();
 	}
 	
-	static boolean isNearGarbage(int x, int y) {
-		for(int d=0;d<4;d++) {
-			int nx = x + dx[d];
-			int ny = y + dy[d];
-			
-			if(!inRange(nx, ny)) continue;
-			
-			if(map[nx][ny] == 'g') {
-				return true;
+	static void checkIsNearGarbage() {
+		for(int i=0;i<N;i++) {
+			for(int j=0;j<M;j++) {
+				if(map[i][j] == 'g') {
+					for(int d=0;d<4;d++) {
+						int nx = i + dx[d];
+						int ny = j + dy[d];
+						
+						if(!inRange(nx, ny)) continue;
+						
+						isNearGarbage[nx][ny] = true;
+					}
+				}
 			}
 		}
-		
-		return false;
+	}
+	
+	static boolean isNearGarbage(int x, int y) {
+		return isNearGarbage[x][y];
 	}
 	
 	static boolean inRange(int x,int y) {
